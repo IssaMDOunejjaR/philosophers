@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 16:05:27 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 18:04:39 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 12:34:43 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ int					g_num_philo_eat;
 sem_t				*g_fork;
 sem_t				*g_lock;
 sem_t				*g_proc;
+sem_t				*g_eat;
 
-typedef struct		s_philo
+typedef struct s_philo
 {
 	int				id;
 	pthread_t		thread;
@@ -44,11 +45,14 @@ typedef struct		s_philo
 
 int					ft_strcmp(char *s1, char *s2);
 int					ft_atoi(const char *str);
-long int			get_time();
+long int			get_time(void);
 void				print_msg(int timestamp, int thread_n, char *msg);
 int					is_all_num(char *str);
 int					check_params(void);
 int					init_options(int argc, char **argv);
-int					create_philo(void);
+void				create_philo(void);
+void				kill_and_free(int *pids);
+void				init_sem(void);
+void				*check_eat(void *data);
 
 #endif

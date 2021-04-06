@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/31 17:29:51 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 14:26:29 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 11:23:16 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,11 @@ pthread_mutex_t		g_lock_print;
 int					g_died;
 int					g_num_philo_eat;
 
-typedef struct		s_philo
+typedef struct s_philo
 {
 	int				id;
 	pthread_t		thread;
 	int				num_eat;
-	long int		last_eat;
 	long int		limit;
 }					t_philo;
 
@@ -44,8 +43,9 @@ int					is_all_num(char *str);
 int					check_params(void);
 int					init_options(int argc, char **argv);
 void				destroy_and_free(t_philo *philo);
-long int			get_time();
+long int			get_time(void);
 void				print_msg(int timestamp, int thread_n, char *msg);
 int					create_philo(t_philo *philo);
+void				mutex_init(t_philo *philo);
 
 #endif

@@ -6,13 +6,13 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:23:18 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 16:59:41 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 11:22:04 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_three.h"
 
-int		is_all_num(char *str)
+int	is_all_num(char *str)
 {
 	int	i;
 
@@ -26,19 +26,19 @@ int		is_all_num(char *str)
 	return (0);
 }
 
-int		check_params(void)
+int	check_params(void)
 {
 	if (g_num_of_philo < 2)
 		return (-1);
 	if (g_num_of_philo > 200)
 		return (-1);
 	if (g_die_time < 60 || g_eat_time < 60
-	|| g_sleep_time < 60)
+		|| g_sleep_time < 60)
 		return (-1);
 	return (0);
 }
 
-int		init_options(int argc, char **argv)
+int	init_options(int argc, char **argv)
 {
 	int		i;
 
@@ -59,4 +59,17 @@ int		init_options(int argc, char **argv)
 	if (check_params() != 0)
 		return (-1);
 	return (0);
+}
+
+void	kill_and_free(int *pids)
+{
+	int	i;
+
+	i = 0;
+	while (i < g_num_of_philo)
+	{
+		kill(pids[i], 1);
+		i++;
+	}
+	free(pids);
 }

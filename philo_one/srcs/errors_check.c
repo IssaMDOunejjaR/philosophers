@@ -6,13 +6,13 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 11:14:37 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 12:22:20 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 11:10:30 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-int		is_all_num(char *str)
+int	is_all_num(char *str)
 {
 	int	i;
 
@@ -26,19 +26,19 @@ int		is_all_num(char *str)
 	return (0);
 }
 
-int		check_params(void)
+int	check_params(void)
 {
 	if (g_num_of_philo < 2)
 		return (-1);
 	if (g_num_of_philo > 200)
 		return (-1);
 	if (g_die_time < 60 || g_eat_time < 60
-	|| g_sleep_time < 60)
+		|| g_sleep_time < 60)
 		return (-1);
 	return (0);
 }
 
-int		init_options(int argc, char **argv)
+int	init_options(int argc, char **argv)
 {
 	int		i;
 

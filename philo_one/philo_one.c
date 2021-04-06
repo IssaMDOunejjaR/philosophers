@@ -6,15 +6,15 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/31 17:29:27 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 14:21:52 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 11:07:32 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-int     main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_philo			*philo;
+	t_philo	*philo;
 
 	if (!(argc >= 5 && argc < 7))
 		printf("Bad Arguments!\n");

@@ -6,7 +6,7 @@
 #    By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/31 18:37:23 by iounejja          #+#    #+#              #
-#    Updated: 2021/04/03 13:12:38 by iounejja         ###   ########.fr        #
+#    Updated: 2021/04/04 12:50:02 by iounejja         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,17 +18,17 @@ EXEC	= philo_one
 SRCS	= philo_one.c \
 			srcs/utils.c \
 			srcs/errors_check.c \
-			srcs/create_threads.c
+			srcs/create_philo.c
 OBJS	= $(SRCS:.c=.o)
 
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
 		ar rcs $(LIB) $(OBJS)
-		$(CC) $(HEADERS) $(LIB) -o $(EXEC)
+		$(CC) $(FLAGS) $(HEADERS) $(LIB) -o $(EXEC)
 
 %.o: %.c headers/*.h
-	$(CC) $(HEADERS) -c $< -o $@
+	$(CC) $(FLAGS) $(HEADERS) -c $< -o $@
 
 clean:
 	rm -rf *.o

@@ -6,13 +6,13 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:22:16 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 14:44:14 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 14:41:00 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_two.h"
 
-int		ft_strcmp(char *s1, char *s2)
+int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
 
@@ -28,7 +28,7 @@ int		ft_strcmp(char *s1, char *s2)
 	return (0);
 }
 
-int		ft_atoi(const char *str)
+int	ft_atoi(const char *str)
 {
 	int		i;
 	int		n;
@@ -38,8 +38,8 @@ int		ft_atoi(const char *str)
 	i = 0;
 	n = 1;
 	nb = 0;
-	while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' ||
-			str[i] == '\v' || str[i] == '\f' || str[i] == '\r')
+	while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n'
+		|| str[i] == '\v' || str[i] == '\f' || str[i] == '\r')
 		i++;
 	if (str[i] == '-')
 		n = -1;
@@ -57,17 +57,22 @@ int		ft_atoi(const char *str)
 	return (nb);
 }
 
-long int get_time()
+long int	get_time(void)
 {
-	struct	timeval	time;
+	struct timeval	time;
+
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec * 0.001));
 }
 
 void	print_msg(int timestamp, int thread_n, char *msg)
 {
-	sem_wait(g_lock);
+	if (sem_wait(g_lock) != 0)
+		return ;
 	printf("%d %d %s\n", timestamp, thread_n, msg);
 	if (ft_strcmp(msg, "died") != 0)
-		sem_post(g_lock);
+	{
+		if (sem_post(g_lock) != 0)
+			return ;
+	}
 }

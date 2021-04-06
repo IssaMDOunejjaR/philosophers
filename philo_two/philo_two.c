@@ -6,15 +6,15 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:11:01 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 16:03:06 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 11:13:02 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_two.h"
 
-int		main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	if (!(argc >= 5 && argc < 7))
 		printf("Bad Arguments!\n");
@@ -31,11 +31,9 @@ int		main(int argc, char **argv)
 			philo = malloc(sizeof(t_philo) * g_num_of_philo);
 			if (create_philo(philo) != 0)
 				printf("Error\n");
-			sem_unlink("fork");
-			sem_unlink("lock");
-			sem_close(g_fork);
-			sem_close(g_lock);
 			free(philo);
+			if (sem_close(g_fork) != 0)
+				return (1);
 		}
 	}
 	return (0);

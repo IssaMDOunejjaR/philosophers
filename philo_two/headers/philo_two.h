@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:11:43 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/03 14:44:35 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/04/06 11:13:59 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,19 @@ int					g_died;
 int					g_num_philo_eat;
 sem_t				*g_fork;
 sem_t				*g_lock;
+sem_t				*g_end;
 
-typedef struct		s_philo
+typedef struct s_philo
 {
 	int				id;
 	pthread_t		thread;
 	int				num_eat;
-	long int		last_eat;
 	long int		limit;
 }					t_philo;
 
 int					ft_strcmp(char *s1, char *s2);
 int					ft_atoi(const char *str);
-long int 			get_time();
+long int			get_time(void);
 int					is_all_num(char *str);
 int					check_params(void);
 int					init_options(int argc, char **argv);
