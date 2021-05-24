@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:22:16 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 12:34:25 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/24 10:24:29 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ void	init_sem(void)
 {
 	pthread_t	th;
 
-	g_time_start = get_time();
 	g_fork = sem_open("fork", O_CREAT, 0644, g_num_of_philo);
 	g_lock = sem_open("lock", O_CREAT, 0644, 1);
 	g_proc = sem_open("proc", O_CREAT, 0644, 0);

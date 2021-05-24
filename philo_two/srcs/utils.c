@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:22:16 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 14:41:00 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/23 18:35:20 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,8 @@ long int	get_time(void)
 
 void	print_msg(int timestamp, int thread_n, char *msg)
 {
-	if (sem_wait(g_lock) != 0)
-		return ;
+	sem_wait(g_lock);
 	printf("%d %d %s\n", timestamp, thread_n, msg);
 	if (ft_strcmp(msg, "died") != 0)
-	{
-		if (sem_post(g_lock) != 0)
-			return ;
-	}
+		sem_post(g_lock);
 }

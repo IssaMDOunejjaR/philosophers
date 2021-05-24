@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/31 17:29:51 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 11:23:16 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/23 12:51:54 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ pthread_mutex_t		*g_fork;
 pthread_mutex_t		g_lock_print;
 int					g_died;
 int					g_num_philo_eat;
+int					g_all_eat;
 
 typedef struct s_philo
 {

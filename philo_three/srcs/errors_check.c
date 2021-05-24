@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:23:18 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 11:22:04 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/24 10:48:10 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,20 @@ int	init_options(int argc, char **argv)
 	return (0);
 }
 
+void	*check_eat(void *data)
+{
+	int	i;
+
+	i = g_num_of_philo;
+	while (i)
+	{
+		sem_wait(g_eat);
+		i--;
+	}
+	sem_post(g_proc);
+	return (NULL);
+}
+
 void	kill_and_free(int *pids)
 {
 	int	i;
@@ -72,4 +86,7 @@ void	kill_and_free(int *pids)
 		i++;
 	}
 	free(pids);
+	sem_close(g_fork);
+	sem_close(g_lock);
+	sem_close(g_proc);
 }

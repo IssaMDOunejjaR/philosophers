@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:11:43 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 11:13:59 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/23 18:50:18 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int					g_died;
 int					g_num_philo_eat;
 sem_t				*g_fork;
 sem_t				*g_lock;
-sem_t				*g_end;
+int					g_eat_all;
 
 typedef struct s_philo
 {

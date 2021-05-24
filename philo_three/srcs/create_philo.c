@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:27:56 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 12:41:00 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/24 10:47:52 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,17 @@ void	*check_death(void *data)
 	philo = data;
 	while (1)
 	{
-		if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-			break ;
+		if (philo->num_eat == g_num_eat)
+		{
+			g_eat_all = 1;
+			exit(0);
+		}
 		if (get_time() > philo->limit)
 		{
 			print_msg(get_time() - g_time_start, philo->id, "died");
 			g_died = 0;
 			sem_post(g_proc);
-			break ;
+			exit(0);
 		}
 		usleep(100);
 	}
@@ -35,31 +38,20 @@ void	*check_death(void *data)
 
 int	start_routine(t_philo *philo)
 {
-	long int	tmp;
-
-	if (sem_wait(g_fork) != 0)
-		return (-1);
+	sem_wait(g_fork);
 	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
-	if (sem_wait(g_fork) != 0)
-		return (-1);
+	sem_wait(g_fork);
 	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
 	print_msg(get_time() - g_time_start, philo->id, "is eating");
 	philo->limit = get_time() + g_die_time;
-	tmp = g_eat_time * 1000;
-	usleep(tmp);
+	usleep(g_eat_time * 1000);
 	philo->num_eat++;
-	if (sem_post(g_fork) != 0)
-		return (-1);
-	if (sem_post(g_fork) != 0)
-		return (-1);
+	sem_post(g_fork);
+	sem_post(g_fork);
 	if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-	{
 		sem_post(g_eat);
-		return (-1);
-	}
 	print_msg(get_time() - g_time_start, philo->id, "is sleeping");
-	tmp = g_sleep_time * 1000;
-	usleep(tmp);
+	usleep(g_sleep_time * 1000);
 	print_msg(get_time() - g_time_start, philo->id, "is thinking");
 	return (0);
 }
@@ -76,10 +68,7 @@ void	*routine(void *data)
 	if (pthread_detach(th) != 0)
 		return (NULL);
 	while (1)
-	{
-		if (start_routine(philo) != 0)
-			break ;
-	}
+		start_routine(philo);
 	return (NULL);
 }
 
@@ -95,26 +84,10 @@ void	child_process(int id)
 		return ;
 	while (g_died)
 	{
-		if (philo.num_eat == g_num_eat)
-			break ;
+		if (g_eat_all == 1)
+			exit(0);
 		usleep(100);
 	}
-	sem_close(g_fork);
-	sem_close(g_lock);
-}
-
-void	*check_eat(void *data)
-{
-	int	i;
-
-	i = g_num_of_philo;
-	while (i)
-	{
-		sem_wait(g_eat);
-		i--;
-	}
-	sem_post(g_proc);
-	return (NULL);
 }
 
 void	create_philo(void)
@@ -126,6 +99,7 @@ void	create_philo(void)
 	pids = malloc(sizeof(int) * g_num_of_philo);
 	init_sem();
 	i = 0;
+	g_time_start = get_time();
 	while (i < g_num_of_philo)
 	{
 		pid = fork();

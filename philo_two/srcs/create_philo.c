@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:27:56 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 19:05:34 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/23 18:43:29 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,12 @@ void	*check_death(void *data)
 	philo = data;
 	while (1)
 	{
-		if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-			break ;
+		if (g_num_philo_eat == g_num_of_philo)
+			g_eat_all = 1;
 		if (get_time() > philo->limit)
 		{
 			print_msg(get_time() - g_time_start, philo->id, "died");
 			g_died = 0;
-			sem_close(g_lock);
-			break ;
 		}
 		usleep(100);
 	}
@@ -35,27 +33,20 @@ void	*check_death(void *data)
 
 int	start_routine(t_philo *philo)
 {
-	long int	tmp;
-
 	sem_wait(g_fork);
 	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
 	sem_wait(g_fork);
 	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
 	print_msg(get_time() - g_time_start, philo->id, "is eating");
 	philo->limit = get_time() + g_die_time;
-	tmp = g_eat_time * 1000;
-	usleep(tmp);
+	usleep(g_eat_time * 1000);
 	philo->num_eat++;
 	sem_post(g_fork);
 	sem_post(g_fork);
 	if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-	{
 		g_num_philo_eat++;
-		return (-1);
-	}
 	print_msg(get_time() - g_time_start, philo->id, "is sleeping");
-	tmp = g_sleep_time * 1000;
-	usleep(tmp);
+	usleep(g_sleep_time * 1000);
 	print_msg(get_time() - g_time_start, philo->id, "is thinking");
 	return (0);
 }
@@ -72,10 +63,7 @@ void	*routine(void *data)
 	if (pthread_detach(th) != 0)
 		return (NULL);
 	while (1)
-	{
-		if (start_routine(philo) != 0)
-			break ;
-	}
+		start_routine(philo);
 	return (NULL);
 }
 
@@ -83,7 +71,6 @@ void	init_sem(t_philo *philo)
 {
 	int	i;
 
-	g_time_start = get_time();
 	g_fork = sem_open("fork", O_CREAT, 0644, g_num_of_philo);
 	g_lock = sem_open("lock", O_CREAT, 0644, 1);
 	i = 0;
@@ -101,6 +88,7 @@ int	create_philo(t_philo *philo)
 
 	init_sem(philo);
 	i = 0;
+	g_time_start = get_time();
 	while (i < g_num_of_philo)
 	{
 		if (pthread_create(&philo[i].thread, NULL, &routine, &philo[i]) != 0)
@@ -112,8 +100,12 @@ int	create_philo(t_philo *philo)
 	}
 	while (g_died)
 	{
-		if (g_num_eat != -1 && g_num_philo_eat == g_num_of_philo)
+		if (g_eat_all == 1)
+		{
+			sem_close(g_lock);
+			sem_close(g_fork);
 			break ;
+		}
 		usleep(100);
 	}
 	return (0);
