@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/31 17:29:27 by iounejja          #+#    #+#             */
-/*   Updated: 2021/05/23 12:52:23 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/29 19:19:46 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,8 @@ int	main(int argc, char **argv)
 		printf("Bad Arguments!\n");
 	else
 	{
-		g_died = 1;
+		g_end = 1;
 		g_num_philo_eat = 0;
-		g_all_eat = 0;
 		if (init_options(argc, argv) != 0)
 			printf("Bad Arguments!\n");
 		else

@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/31 17:50:38 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 11:12:12 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/30 17:54:47 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,19 @@ long int	get_time(void)
 	return ((time.tv_sec * 1000) + (time.tv_usec * 0.001));
 }
 
-void	print_msg(int timestamp, int thread_n, char *msg)
+void	print_msg(int timestamp, int thread_n, char *msg, t_philo *philo)
 {
 	pthread_mutex_lock(&g_lock_print);
-	printf("%d %d %s\n", timestamp, thread_n, msg);
-	if (ft_strcmp(msg, "died") != 0)
+	printf("%d ms %d %s\n", timestamp, thread_n, msg);
+	if (ft_strcmp(msg, "is eating") == 0)
+	{
+		philo->num_eat++;
+		if (g_num_eat != -1 && philo->num_eat == g_num_eat)
+			g_num_philo_eat++;
+		if (!(g_num_eat != -1 && g_num_philo_eat == g_num_of_philo))
+			pthread_mutex_unlock(&g_lock_print);
+	}
+	else if (ft_strcmp(msg, "died") != 0)
 		pthread_mutex_unlock(&g_lock_print);
 }
 
@@ -81,9 +89,11 @@ void	destroy_and_free(t_philo *philo)
 	while (i < g_num_of_philo)
 	{
 		pthread_mutex_destroy(&g_fork[i]);
+		pthread_mutex_destroy(&philo[i].check);
 		i++;
 	}
 	pthread_mutex_destroy(&g_lock_print);
+	pthread_mutex_destroy(&g_eat);
 	free(philo);
 	free(g_fork);
 }

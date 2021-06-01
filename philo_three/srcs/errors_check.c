@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:23:18 by iounejja          #+#    #+#             */
-/*   Updated: 2021/05/24 10:48:10 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/30 19:07:21 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,11 @@ int	init_options(int argc, char **argv)
 	g_sleep_time = ft_atoi(argv[4]);
 	g_num_eat = -1;
 	if (argc == 6)
+	{
 		g_num_eat = ft_atoi(argv[5]);
+		if (g_num_eat <= 0)
+			return (-1);
+	}
 	if (check_params() != 0)
 		return (-1);
 	return (0);
@@ -65,11 +69,14 @@ void	*check_eat(void *data)
 {
 	int	i;
 
+	data = NULL;
 	i = g_num_of_philo;
 	while (i)
 	{
 		sem_wait(g_eat);
 		i--;
+		if (i != 0)
+			sem_post(g_lock);
 	}
 	sem_post(g_proc);
 	return (NULL);
@@ -86,7 +93,4 @@ void	kill_and_free(int *pids)
 		i++;
 	}
 	free(pids);
-	sem_close(g_fork);
-	sem_close(g_lock);
-	sem_close(g_proc);
 }

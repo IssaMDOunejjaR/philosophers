@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:27:56 by iounejja          #+#    #+#             */
-/*   Updated: 2021/05/24 10:47:52 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/30 18:52:10 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,13 @@ void	*check_death(void *data)
 	philo = data;
 	while (1)
 	{
-		if (philo->num_eat == g_num_eat)
-		{
-			g_eat_all = 1;
-			exit(0);
-		}
 		if (get_time() > philo->limit)
 		{
-			print_msg(get_time() - g_time_start, philo->id, "died");
-			g_died = 0;
+			sem_wait(philo->check);
+			print_msg(get_time() - g_time_start, philo->id, "died", philo);
+			g_end = 0;
 			sem_post(g_proc);
-			exit(0);
+			return (NULL);
 		}
 		usleep(100);
 	}
@@ -38,21 +34,20 @@ void	*check_death(void *data)
 
 int	start_routine(t_philo *philo)
 {
+	sem_wait(philo->check);
 	sem_wait(g_fork);
-	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
+	print_msg(get_time() - g_time_start, philo->id, "has taken a fork", philo);
 	sem_wait(g_fork);
-	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
-	print_msg(get_time() - g_time_start, philo->id, "is eating");
+	print_msg(get_time() - g_time_start, philo->id, "has taken a fork", philo);
+	print_msg(get_time() - g_time_start, philo->id, "is eating", philo);
 	philo->limit = get_time() + g_die_time;
 	usleep(g_eat_time * 1000);
-	philo->num_eat++;
 	sem_post(g_fork);
 	sem_post(g_fork);
-	if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-		sem_post(g_eat);
-	print_msg(get_time() - g_time_start, philo->id, "is sleeping");
+	sem_post(philo->check);
+	print_msg(get_time() - g_time_start, philo->id, "is sleeping", philo);
 	usleep(g_sleep_time * 1000);
-	print_msg(get_time() - g_time_start, philo->id, "is thinking");
+	print_msg(get_time() - g_time_start, philo->id, "is thinking", philo);
 	return (0);
 }
 
@@ -74,20 +69,21 @@ void	*routine(void *data)
 
 void	child_process(int id)
 {
-	t_philo		philo;
+	t_philo	philo;
+	char	*sem_name;
 
 	philo.id = id;
 	philo.num_eat = 0;
+	sem_name = ft_itoa(id);
+	sem_unlink(sem_name);
+	philo.check = sem_open(sem_name, O_CREAT, 06444, 1);
+	free(sem_name);
 	if (pthread_create(&philo.thread, NULL, &routine, &philo) != 0)
 		return ;
 	if (pthread_detach(philo.thread) != 0)
 		return ;
-	while (g_died)
-	{
-		if (g_eat_all == 1)
-			exit(0);
+	while (g_end)
 		usleep(100);
-	}
 }
 
 void	create_philo(void)
@@ -96,9 +92,9 @@ void	create_philo(void)
 	pid_t		pid;
 	int			*pids;
 
-	pids = malloc(sizeof(int) * g_num_of_philo);
 	init_sem();
 	i = 0;
+	pids = malloc(sizeof(int) * g_num_of_philo);
 	g_time_start = get_time();
 	while (i < g_num_of_philo)
 	{

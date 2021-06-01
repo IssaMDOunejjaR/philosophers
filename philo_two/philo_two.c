@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:11:01 by iounejja          #+#    #+#             */
-/*   Updated: 2021/05/23 18:50:09 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/30 18:16:12 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ int	main(int argc, char **argv)
 	{
 		sem_unlink("fork");
 		sem_unlink("lock");
-		g_died = 1;
+		sem_unlink("eat");
+		g_end = 1;
 		g_num_philo_eat = 0;
-		g_eat_all = 0;
 		if (init_options(argc, argv) != 0)
 			printf("Bad Arguments!\n");
 		else
@@ -33,6 +33,9 @@ int	main(int argc, char **argv)
 			if (create_philo(philo) != 0)
 				printf("Error\n");
 			free(philo);
+			sem_unlink("fork");
+			sem_unlink("lock");
+			sem_unlink("eat");
 		}
 	}
 	return (0);

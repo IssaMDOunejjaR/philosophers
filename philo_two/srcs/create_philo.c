@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 14:27:56 by iounejja          #+#    #+#             */
-/*   Updated: 2021/05/23 18:43:29 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/30 18:34:15 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,36 +19,41 @@ void	*check_death(void *data)
 	philo = data;
 	while (1)
 	{
-		if (g_num_philo_eat == g_num_of_philo)
-			g_eat_all = 1;
 		if (get_time() > philo->limit)
 		{
-			print_msg(get_time() - g_time_start, philo->id, "died");
-			g_died = 0;
+			sem_wait(philo->check);
+			print_msg(get_time() - g_time_start, philo->id, "died", philo);
+			g_end = 0;
+			return (NULL);
 		}
 		usleep(100);
 	}
 	return (NULL);
 }
 
-int	start_routine(t_philo *philo)
+void	start_routine(t_philo *philo)
 {
+	sem_wait(philo->check);
 	sem_wait(g_fork);
-	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
+	print_msg(get_time() - g_time_start, philo->id, "has taken a fork", philo);
 	sem_wait(g_fork);
-	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
-	print_msg(get_time() - g_time_start, philo->id, "is eating");
+	print_msg(get_time() - g_time_start, philo->id, "has taken a fork", philo);
 	philo->limit = get_time() + g_die_time;
+	print_msg(get_time() - g_time_start, philo->id, "is eating", philo);
 	usleep(g_eat_time * 1000);
-	philo->num_eat++;
+	sem_wait(g_eat);
+	if (g_num_eat != -1 && g_num_philo_eat == g_num_of_philo)
+	{
+		g_end = 0;
+		return ;
+	}
+	sem_post(g_eat);
 	sem_post(g_fork);
 	sem_post(g_fork);
-	if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-		g_num_philo_eat++;
-	print_msg(get_time() - g_time_start, philo->id, "is sleeping");
+	sem_post(philo->check);
+	print_msg(get_time() - g_time_start, philo->id, "is sleeping", philo);
 	usleep(g_sleep_time * 1000);
-	print_msg(get_time() - g_time_start, philo->id, "is thinking");
-	return (0);
+	print_msg(get_time() - g_time_start, philo->id, "is thinking", philo);
 }
 
 void	*routine(void *data)
@@ -69,15 +74,21 @@ void	*routine(void *data)
 
 void	init_sem(t_philo *philo)
 {
-	int	i;
+	int		i;
+	char	*sem_name;
 
 	g_fork = sem_open("fork", O_CREAT, 0644, g_num_of_philo);
 	g_lock = sem_open("lock", O_CREAT, 0644, 1);
+	g_eat = sem_open("eat", O_CREAT, 0644, 1);
 	i = 0;
 	while (i < g_num_of_philo)
 	{
 		philo[i].num_eat = 0;
 		philo[i].id = i;
+		sem_name = ft_itoa(i);
+		sem_unlink(sem_name);
+		philo[i].check = sem_open(sem_name, O_CREAT, 0644, 1);
+		free(sem_name);
 		i++;
 	}
 }
@@ -86,8 +97,8 @@ int	create_philo(t_philo *philo)
 {
 	int		i;
 
-	init_sem(philo);
 	i = 0;
+	init_sem(philo);
 	g_time_start = get_time();
 	while (i < g_num_of_philo)
 	{
@@ -98,15 +109,7 @@ int	create_philo(t_philo *philo)
 		usleep(100);
 		i++;
 	}
-	while (g_died)
-	{
-		if (g_eat_all == 1)
-		{
-			sem_close(g_lock);
-			sem_close(g_fork);
-			break ;
-		}
+	while (g_end)
 		usleep(100);
-	}
 	return (0);
 }

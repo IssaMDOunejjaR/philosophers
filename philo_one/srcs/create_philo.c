@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 12:25:22 by iounejja          #+#    #+#             */
-/*   Updated: 2021/05/23 17:43:06 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/06/01 11:20:05 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,36 +19,41 @@ void	*check_death(void *data)
 	philo = data;
 	while (1)
 	{
-		if (g_num_philo_eat == g_num_of_philo)
-			g_all_eat = 1;
 		if (get_time() > philo->limit)
 		{
-			print_msg(get_time() - g_time_start, philo->id, "died");
-			g_died = 0;
+			pthread_mutex_lock(&philo->check);
+			print_msg(get_time() - g_time_start, philo->id, "died", philo);
+			g_end = 0;
+			return (NULL);
 		}
 		usleep(100);
 	}
 	return (NULL);
 }
 
-int	start_routine(t_philo *philo)
+void	start_routine(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->check);
 	pthread_mutex_lock(&g_fork[philo->id]);
-	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
+	print_msg(get_time() - g_time_start, philo->id, "has taken a fork", philo);
 	pthread_mutex_lock(&g_fork[(philo->id + 1) % g_num_of_philo]);
-	print_msg(get_time() - g_time_start, philo->id, "has taken a fork");
-	print_msg(get_time() - g_time_start, philo->id, "is eating");
+	print_msg(get_time() - g_time_start, philo->id, "has taken a fork", philo);
 	philo->limit = get_time() + g_die_time;
+	print_msg(get_time() - g_time_start, philo->id, "is eating", philo);
 	usleep(g_eat_time * 1000);
-	philo->num_eat++;
+	pthread_mutex_lock(&g_eat);
+	if (g_num_eat != -1 && g_num_philo_eat == g_num_of_philo)
+	{
+		g_end = 0;
+		return ;
+	}
+	pthread_mutex_unlock(&g_eat);
 	pthread_mutex_unlock(&g_fork[philo->id]);
 	pthread_mutex_unlock(&g_fork[(philo->id + 1) % g_num_of_philo]);
-	if (g_num_eat != -1 && philo->num_eat == g_num_eat)
-		g_num_philo_eat++;
-	print_msg(get_time() - g_time_start, philo->id, "is sleeping");
+	pthread_mutex_unlock(&philo->check);
+	print_msg(get_time() - g_time_start, philo->id, "is sleeping", philo);
 	usleep(g_sleep_time * 1000);
-	print_msg(get_time() - g_time_start, philo->id, "is thinking");
-	return (0);
+	print_msg(get_time() - g_time_start, philo->id, "is thinking", philo);
 }
 
 void	*routine(void *data)
@@ -63,16 +68,13 @@ void	*routine(void *data)
 	if (pthread_detach(th) != 0)
 		return (NULL);
 	while (1)
-	{
-		if (start_routine(philo) != 0)
-			break ;
-	}
+		start_routine(philo);
 	return (NULL);
 }
 
 void	mutex_init(t_philo *philo)
 {
-	int		i;
+	int			i;
 
 	i = 0;
 	while (i < g_num_of_philo)
@@ -83,18 +85,20 @@ void	mutex_init(t_philo *philo)
 	i = 0;
 	while (i < g_num_of_philo)
 	{
-		philo[i].num_eat = 0;
 		philo[i].id = i;
+		philo[i].num_eat = 0;
+		pthread_mutex_init(&philo[i].check, NULL);
 		i++;
 	}
+	pthread_mutex_init(&g_eat, NULL);
 }
 
 int	create_philo(t_philo *philo)
 {
 	int		i;
 
-	mutex_init(philo);
 	i = 0;
+	mutex_init(philo);
 	g_time_start = get_time();
 	while (i < g_num_of_philo)
 	{
@@ -105,11 +109,7 @@ int	create_philo(t_philo *philo)
 		usleep(100);
 		i++;
 	}
-	while (g_died)
-	{
-		if (g_all_eat == 1)
-			break ;
+	while (g_end)
 		usleep(100);
-	}
 	return (0);
 }

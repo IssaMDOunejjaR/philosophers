@@ -6,7 +6,7 @@
 /*   By: iounejja <iounejja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/03 11:14:37 by iounejja          #+#    #+#             */
-/*   Updated: 2021/04/06 11:10:30 by iounejja         ###   ########.fr       */
+/*   Updated: 2021/05/30 19:40:35 by iounejja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,11 @@ int	init_options(int argc, char **argv)
 	g_sleep_time = ft_atoi(argv[4]);
 	g_num_eat = -1;
 	if (argc == 6)
+	{
 		g_num_eat = ft_atoi(argv[5]);
+		if (g_num_eat <= 0)
+			return (-1);
+	}
 	if (check_params() != 0)
 		return (-1);
 	return (0);
